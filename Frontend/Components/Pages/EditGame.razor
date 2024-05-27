@@ -1,0 +1,93 @@
+﻿@page "/editgame"
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>New Game</PageTitle>
+
+
+@if (genres == null)
+{
+    <p class="text-center mb-3">Loading...</p>
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <h1 class="h1 text-center text-dark">New Game</h1>
+
+
+    <div class="row">
+        <div class="col-md-4">
+            @* Editforms for new game *@
+            <EditForm Model="@game" FormName="editGame" OnSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-floating mb-3">
+                    <InputText id="name" class="form-control" @bind-Value="game.Name" placeholder="Name" />
+                    <label for="name">Name</label>
+                </div>
+
+
+                <div class="form-floating mb-3">
+                    <InputSelect id="genre" class="form-select" @bind-Value="game.GenreId">
+
+                        <option value="">Select a Genre</option>
+                        @foreach (var genre in genres)
+                        {
+                            <option value="@genre.Id">@genre.Name</option>
+                        }
+
+                    </InputSelect>
+                    <label for="genre">Genre</label>
+                </div>
+
+
+                <div class="form-floating mb-3">
+                    <InputNumber id="price" class="form-control" @bind-Value="game.Price" />
+                    <label for="price">Price</label>
+
+                </div>
+
+                <div class="form-floating mb-3">
+                    <InputDate id="releaseDate" class="form-control" @bind-Value="game.ReleaseDate"
+                        placeholder="Release Date" />
+                    <label for="releaseDate">Release Date</label>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a role="button" class="btn btn-secondary" href="/">Cancel</a>
+            </EditForm>
+
+        </div>
+    </div>
+
+}
+@code {
+
+    [SupplyParameterFromForm] // This attribute is used to supply the parameter from the form
+    private GameDetails game { get; set; } = new()
+        {
+            Name = "",
+            ReleaseDate = DateOnly.FromDateTime(DateTime.UtcNow),
+        };
+
+    private GenreClient genreClient = new();
+    private GamesClients gamesClient = new();
+    private Genre[]? genres;
+
+    protected override void OnInitialized()
+    {
+        genres = genreClient.GetGenres();
+    }
+
+    private void HandleSubmit()
+    {
+        gamesClient.AddGame(game);
+        NavigationManager.NavigateTo("/"); // using the dependency injection to navigate to the home page
+    }
+}
