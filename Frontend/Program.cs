@@ -1,9 +1,13 @@
+using Frontend.Clients;
 using Frontend.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents();
+
+// We use one instance of the client for the whole application so that we can add/ modify the games list from any component
+builder.Services.AddSingleton<GamesClients>();
 
 var app = builder.Build();
 
