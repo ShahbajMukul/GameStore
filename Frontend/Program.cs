@@ -1,13 +1,23 @@
+
+
+
 using Frontend.Clients;
 using Frontend.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents();
+// builder.Services.AddRazorComponents();
+
+// Client Side Interactivity enabled
+builder.Services.AddRazorComponents().
+                AddInteractiveServerComponents();
+
 
 // We use one instance of the client for the whole application so that we can add/ modify the games list from any component
 builder.Services.AddSingleton<GamesClients>();
+
+builder.Services.AddSingleton<GenreClient>();
 
 var app = builder.Build();
 
@@ -24,6 +34,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.MapRazorComponents<App>();
+// app.MapRazorComponents<App>();
+
+// Enables Server Side Interactivity
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

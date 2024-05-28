@@ -36,11 +36,7 @@ DateOnly(2018, 5, 25) },
 
     public void AddGame(GameDetails game)
     {
-        // Validate that the genre id is not null or whitespace so that we can get the genre name
-        ArgumentException.ThrowIfNullOrWhiteSpace(game.GenreId);
-
-        // This is a simple way to get the genre from the genre id
-        var genre = genres.Single(genre => genre.Id == int.Parse(game.GenreId));
+        Genre genre = GetGenreById(game.GenreId);
 
         var GameSummary = new GameSummary
         {
@@ -53,4 +49,58 @@ DateOnly(2018, 5, 25) },
 
         games.Add(GameSummary);
     }
+
+
+
+    public GameDetails GetGame(int id)
+    {
+        GameSummary game = GetGameSummaryById(id);
+
+        var genre = genres.Single(genre => string.Equals(genre.Name, game.Genre, StringComparison.OrdinalIgnoreCase));
+
+        return new GameDetails
+        {
+            Id = game.Id,
+            Name = game.Name,
+            GenreId = genre.Id.ToString(),
+            Price = game.Price,
+            ReleaseDate = game.ReleaseDate
+        };
+    }
+
+    private GameSummary GetGameSummaryById(int id)
+    {
+        var game = games.Find(game => game.Id == id);
+        ArgumentNullException.ThrowIfNull(game);
+        return game;
+    }
+
+    private Genre GetGenreById(string? id)
+    {
+        // Validate that the genre id is not null or whitespace so that we can get the genre name
+        ArgumentException.ThrowIfNullOrWhiteSpace(id);
+
+        // This is a simple way to get the genre from the genre id
+        return genres.Single(genre => genre.Id == int.Parse(id));
+    }
+
+    public void UpdateGame(GameDetails updatedGame)
+    {
+        GameSummary existingGame = GetGameSummaryById(updatedGame.Id);
+
+        Genre genre = GetGenreById(updatedGame.GenreId);
+
+        existingGame.Name = updatedGame.Name;
+        existingGame.Genre = genre.Name;
+        existingGame.Price = updatedGame.Price;
+        existingGame.ReleaseDate = updatedGame.ReleaseDate;
+    }
+
+    public void DeleteGame(int id)
+    {
+        GameSummary game = GetGameSummaryById(id);
+        games.Remove(game);
+    }
+
 }
+

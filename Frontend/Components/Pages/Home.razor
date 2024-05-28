@@ -30,7 +30,7 @@ else
             <th class="text-center">Genre</th>
             <th class="text-center">Price</th>
             <th class="text-center">Release Date</th>
-            <th></th>
+            <th class="text-center">Edit</th>
         </tr>
     </thead>
     <tbody>
@@ -42,7 +42,18 @@ else
                 <td>@game.Genre</td>
                 <td class="text-end">@game.Price.ToString("C2")</td>
                 <td>@game.ReleaseDate</td>
-                <td></td>
+                <td>
+                    <div class="d-flex">
+                        <a href="@GetUrl(game.Id)" class="btn btn-secondary me-2" role="button">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="@GetDeleteModalId(game)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <DeleteGame Game="@game" /> <!-- This is the modal -->
+                </td>
             </tr>
         }
     </tbody>
@@ -60,4 +71,13 @@ else
         // Get the games from the API
         games = Client.GetGames();
     }
+
+    private static string GetUrl(int id) => $"/editgame/{id}";
+
+    private string GetDeleteModalId(GameSummary game)
+    {
+        ArgumentNullException.ThrowIfNull(game);
+        return $"#{DeleteGame.GetModalId(game)}";
+    }
+
 }

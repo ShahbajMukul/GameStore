@@ -1,13 +1,16 @@
 ﻿@page "/editgame"
+@page "/editgame/{id:int}"
+
 @inject NavigationManager NavigationManager
 @inject GamesClients GamesClient
 @inject GenreClient GenreClient
+@rendermode InteractiveServer
 
 
 <PageTitle>New Game</PageTitle>
 
 
-@if (genres == null)
+@if (genres == null || game == null)
 {
     <p class="text-center mb-3">Loading...</p>
     <div class="d-flex justify-content-center">
@@ -18,19 +21,20 @@
 }
 else
 {
-    <h1 class="h1 text-center text-dark">New Game</h1>
+    <h1 class="h1 text-center text-dark">@title</h1>
 
 
     <div class="row">
         <div class="col-md-4">
             @* Editforms for new game *@
-            <EditForm Model="@game" FormName="editGame" OnSubmit="HandleSubmit">
+            <EditForm Model="@game" FormName="editGame" OnValidSubmit="HandleSubmit"> @* OnValidSubmit communicates witht he
+            model for required fields*@
                 <DataAnnotationsValidator />
-                <ValidationSummary />
 
                 <div class="form-floating mb-3">
                     <InputText id="name" class="form-control" @bind-Value="game.Name" placeholder="Name" />
                     <label for="name">Name</label>
+                    <ValidationMessage For="@(() => game.Name)" />
                 </div>
 
 
@@ -45,12 +49,16 @@ else
 
                     </InputSelect>
                     <label for="genre">Genre</label>
+                    <ValidationMessage For="@(() => game.GenreId)" />
+
                 </div>
 
 
                 <div class="form-floating mb-3">
                     <InputNumber id="price" class="form-control" @bind-Value="game.Price" />
                     <label for="price">Price</label>
+                    <ValidationMessage For="@(() => game.Price)" />
+
 
                 </div>
 
@@ -61,7 +69,7 @@ else
                 </div>
 
 
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-success">Save</button>
                 <a role="button" class="btn btn-secondary" href="/">Cancel</a>
             </EditForm>
 
@@ -70,16 +78,40 @@ else
 
 }
 @code {
+    [Parameter] // This attribute is used to supply the parameter from the URL
+    public int? Id { get; set; }
 
     [SupplyParameterFromForm] // This attribute is used to supply the parameter from the form
-    private GameDetails game { get; set; } = new()
-        {
-            Name = "",
-            ReleaseDate = DateOnly.FromDateTime(DateTime.UtcNow),
-        };
+    private GameDetails? game { get; set; }
 
 
     private Genre[]? genres;
+
+    private string title = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        // we are doing this to prevent the game from being overwritten
+        if (game is not null)
+        {
+            return;
+        }
+
+        if (Id.HasValue)
+        {
+            game = GamesClient.GetGame(Id.Value);
+            title = $"Editing: {game.Name}";
+        }
+        else
+        {
+            game = new GameDetails
+                {
+                    Name = string.Empty,
+                    ReleaseDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                };
+            title = "New Game";
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -88,7 +120,18 @@ else
 
     private void HandleSubmit()
     {
-        GamesClient.AddGame(game);
+        ArgumentNullException.ThrowIfNull(game);
+
+        if (Id is null)
+        {
+            GamesClient.AddGame(game);
+        }
+        else
+        {
+            game.Id = Id.Value; // Because the Id is not part of the form, we need to set it here
+            GamesClient.UpdateGame(game);
+        }
+
         NavigationManager.NavigateTo("/"); // using the dependency injection to navigate to the home page
     }
 }
