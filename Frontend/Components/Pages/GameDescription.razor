@@ -1,0 +1,47 @@
+﻿@inject GamesClients Client
+@inject NavigationManager NavigationManager
+
+@* We need interactivity for delete *@
+@rendermode InteractiveServer
+
+
+<div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Add Game Description</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="@SaveDescription">Save
+                    changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    private string userDescription = string.Empty;
+
+    [Parameter]
+    public GameSummary? Game { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        userDescription = Game?.Description ?? string.Empty;
+    }
+
+    private void SaveDescription()
+    {
+        ArgumentNullException.ThrowIfNull(Game);
+        Game.Description = userDescription;
+        NavigationManager.Refresh();
+    }
+
+}

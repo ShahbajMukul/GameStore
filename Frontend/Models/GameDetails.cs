@@ -14,4 +14,5 @@ public class GameDetails
     [Range(0.00, 200)]
     public decimal Price { get; set; }
     public DateOnly ReleaseDate { get; set; }
+    public string? Description { get; set; }
 }

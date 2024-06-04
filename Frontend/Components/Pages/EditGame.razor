@@ -36,7 +36,16 @@ else
                     <label for="name">Name</label>
                     <ValidationMessage For="@(() => game.Name)" />
                 </div>
+                @* <InputText id="description" class="form-control" @bind-Value="game.Description"
+            placeholder="Description" rows="3" />
+            <label for="description">Description</label>
+            <ValidationMessage For="@(() => game.Description)" /> *@
+                <div class="form-floating mb-3">
 
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#descriptionModal"> <i
+                            class="bi bi-pencil-square"></i> </button>
+                </div>
+                <GameDescription />
 
                 <div class="form-floating mb-3">
                     <InputSelect id="genre" class="form-select" @bind-Value="game.GenreId">

@@ -27,6 +27,7 @@ else
         <tr>
             <th class="text-center">Id</th>
             <th class="text-center">Name</th>
+            <th class="text-center">Description</th>
             <th class="text-center">Genre</th>
             <th class="text-center">Price</th>
             <th class="text-center">Release Date</th>
@@ -39,6 +40,7 @@ else
             <tr>
                 <td>@game.Id</td>
                 <td>@game.Name</td>
+                <td>@game.Description</td>
                 <td>@game.Genre</td>
                 <td class="text-end">@game.Price.ToString("C2")</td>
                 <td>@game.ReleaseDate</td>
@@ -79,5 +81,7 @@ else
         ArgumentNullException.ThrowIfNull(game);
         return $"#{DeleteGame.GetModalId(game)}";
     }
+
+
 
 }
