@@ -1,0 +1,110 @@
+﻿@page "/gamereviews"
+@using Frontend.Clients
+@using Microsoft.AspNetCore.Components
+@using Frontend.Models
+
+@inject NavigationManager NavigationManager
+@inject GameReviewClient Client
+
+@code {
+    private List<GameReview>? reviews;
+    private GameReview newReview = new GameReview();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        reviews = Client.GetGameReviews();
+        isLoading = false;
+    }
+
+    private string GetUrl(int id) => $"/editreview/{id}";
+
+    private string GetDeleteModalId(GameReview review) => $"#deleteModal-{review.Id}";
+
+    private void AddReview()
+    {
+        Client.AddReview(newReview);
+        newReview = new GameReview();
+    }
+}
+
+<PageTitle>Game Reviews</PageTitle>
+
+@if (isLoading)
+{
+    <p class="text-center mb-3">Loading...</p>
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <h1 class="h1 text-center text-dark">Game Reviews</h1>
+
+    <table class="table table-striped table-bordered table-hover m-3">
+        <thead class="table-dark">
+            <tr>
+                <th class="text-center">Game</th>
+                <th class="text-center">Rating</th>
+                <th class="text-center">Title</th>
+                <th class="text-center">Review</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var review in reviews)
+            {
+                <tr>
+                    <td>@review.GameName</td>
+                    <td>@review.Rating</td>
+                    <td>@review.Title</td>
+                    <td>@review.Review</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @* A nice form to add a new review *@
+
+    <div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Add Game Review</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="@newReview" OnValidSubmit="AddReview">
+                        <div class="form-floating mb-3">
+                            <InputText id="gameName" class="form-control" placeholder="Game Name"
+                                @bind-Value="newReview.GameName" />
+                            <label for="gameName">Game Name</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <InputText id="rating" class="form-control" placeholder="Rating"
+                                @bind-Value="newReview.Rating" />
+                            <label for="rating">Rating</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <InputText id="title" class="form-control" placeholder="Title" @bind-Value="newReview.Title" />
+                            <label for="title">Title</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <InputText id="review" class="form-control" placeholder="Review"
+                                @bind-Value="newReview.Review" />
+                            <label for="review">Review</label>
+                        </div>
+                    </EditForm>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" @onclick="AddReview" data-bs-dismiss="modal">Save
+                        changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+}

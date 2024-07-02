@@ -19,6 +19,8 @@ builder.Services.AddSingleton<GamesClients>();
 
 builder.Services.AddSingleton<GenreClient>();
 
+builder.Services.AddSingleton<GameReviewClient>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
